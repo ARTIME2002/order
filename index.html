@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARTIME — Handcrafted Clocks</title>
+<meta name="theme-color" content="#1f1a17">
+<meta name="description" content="ARTIME handcrafted clocks - browse and place your order">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ARTIME">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand"><img src="icons/icon-192.png" alt=""><div><b>ARTIME</b><small>Fine Handcrafted Clocks</small></div></div>
+    <button class="install" id="installBtn" hidden>⬇ Install app</button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="searchrow"><input type="search" id="search" placeholder="Search by code, size or colour…" autocomplete="off"><span id="count"></span></div>
+</header>
+
+<main>
+  <div class="grid" id="grid"><div class="state">Loading catalog…</div></div>
+</main>
+
+<div class="bar" id="bar">
+  <div class="bar-info"><b id="barPcs">0 pcs</b><span id="barTotal"></span></div>
+  <button class="btn primary" id="placeBtn">Place Order</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- photo viewer -->
+<div class="lb" id="lb">
+  <button class="lb-x" data-lb="close">&times;</button>
+  <button class="lb-n prev" data-lb="prev">&#8249;</button>
+  <img id="lbImg" alt="">
+  <button class="lb-n next" data-lb="next">&#8250;</button>
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<!-- order sheet -->
+<div class="sheet-wrap" id="sheet"><div class="sheet" id="sheetBox"></div></div>
+
+<script src="app.js"></script>
+<script src="customer.js"></script>
+</body>
+</html>

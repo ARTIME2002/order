@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ARTIME Admin</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <img src="icons/icon-192.png" alt="">
+    <h1>ARTIME</h1>
+    <p>Admin panel</p>
+    <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password">
+    <button class="btn primary" id="loginBtn">Enter</button>
+    <div class="gate-err" id="gateErr"></div>
+    <a href="index.html" style="font-size:13px;color:var(--muted)">← Customer catalog</a>
+  </div>
+</div>
+
+<div class="adm" id="adm" style="display:none">
+  <div class="adm-top">
+    <h1>ARTIME Admin</h1>
+    <a class="btn" href="index.html" target="_blank">View customer app</a>
+    <button class="btn" id="importBtn">Import JSON</button>
+    <button class="btn" id="exportBtn">Export JSON</button>
+    <button class="btn" id="tgBtn">Test Telegram</button>
+    <button class="btn primary" id="saveBtn">Save changes</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="panel">
+    <h2>Customer app settings</h2>
+    <p class="n">Customers see <b>one price</b> (no password). Choose which of your price columns they see. Other prices are never sent to customers.</p>
+    <div class="fg">
+      <label>Price shown to customers<select id="sTier" data-s="customerTier"></select></label>
+      <label>WhatsApp number (with 91)<input data-s="whatsapp"></label>
+      <label>Phone on PDF<input data-s="phone"></label>
+      <label>Email on PDF<input data-s="email"></label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Price column names</h2>
+    <div class="fg" id="tierNames"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Categories (tabs in the customer app)</h2>
+    <p class="n">Rename or reorder the tabs. Each product belongs to one category.</p>
+    <div id="cats"></div>
+    <button class="btn" id="addCat">+ Add category</button>
+  </div>
+
+  <h2 style="margin:20px 0 0">Products (<span id="pcount">0</span>)</h2>
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search code / title…">
+    <select id="fcat"></select>
+    <button class="btn" id="addProd">+ Add product</button>
+  </div>
+  <p class="n" style="font-size:13px;color:var(--muted);margin:0 0 10px">Photo fields take a path like <code>images/products/CODE-1.jpg</code> or a full image link. Products with a price of 0 are hidden from customers.</p>
+  <div id="plist"></div>
+  <div style="text-align:center"><button class="btn" id="more" hidden>Show more</button></div>
+</div>
+
+<script src="app.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* Shared settings + helpers (customer app and admin panel) */
-const API_BASE = "https://artime-catalog.thetimesandcraftexport.workers.dev";   // your Cloudflare Worker URL
+const API_BASE = "https://polished-lab-aef5.thetimesandcraftexport.workers.dev";   // your Cloudflare Worker URL
 const JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 
 function money(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }

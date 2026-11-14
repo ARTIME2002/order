@@ -46,6 +46,28 @@ function selectCat(k) {
   window.scrollTo({ top: 0 });
 }
 
+/* ---------- colour dot + list/grid view ---------- */
+function dotCss(f) {
+  f = String(f || '').toLowerCase();
+  if (f.includes('copper')) return '#b87333';
+  if (f.includes('silver')) return '#b9bec5';
+  if (f.includes('black')) return '#262626';
+  if (f.includes('wood') && f.includes('brass')) return 'linear-gradient(135deg,#8a5a2b 50%,#c9a227 50%)';
+  if (f.includes('brass')) return '#c9a227';
+  if (f.includes('paint')) return 'conic-gradient(#d9534f,#f0ad4e,#5cb85c,#3b82c4,#8e5bb5,#d9534f)';
+  return '#cdbfa5';
+}
+let VIEW = localStorage.getItem('artime_view') || (window.innerWidth < 620 ? 'list' : 'grid');
+function applyView() {
+  $('#grid').classList.toggle('list', VIEW === 'list');
+  $('#viewBtn').innerHTML = VIEW === 'list'
+    ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="3" y="4" width="18" height="4" rx="1.5"/><rect x="3" y="10" width="18" height="4" rx="1.5"/><rect x="3" y="16" width="18" height="4" rx="1.5"/></svg>';
+  $('#viewBtn').title = VIEW === 'list' ? 'Show grid' : 'Show list';
+}
+$('#viewBtn').addEventListener('click', () => { VIEW = VIEW === 'list' ? 'grid' : 'list'; localStorage.setItem('artime_view', VIEW); applyView(); });
+applyView();
+
 /* ---------- product grid ---------- */
 function renderGrid() {
   const items = DATA.products.filter(p => {
@@ -60,15 +82,17 @@ function renderGrid() {
       <div class="ph" data-act="zoom"><img src="${esc(mainImg(p))}" alt="${esc(p.code)}" loading="lazy" onerror="this.onerror=null;this.src=PLACEHOLDER"></div>
       <div class="info">
         <div class="code">${esc(p.code)}</div>
-        <div class="meta"><span>Size</span> ${esc(sizeTxt(p.size))}</div>
-        <div class="meta"><span>Colour</span> ${esc(p.finish)}</div>
-        <div class="price">${money(p.price)} <small>+ GST</small></div>
-        <div class="buy">
-          <div class="stepper"><button data-act="minus" aria-label="less">−</button><input type="number" inputmode="numeric" min="1" value="1" aria-label="quantity"><button data-act="plus" aria-label="more">+</button></div>
-          <button class="btn add" data-act="add">Add</button>
+        <div class="metas">
+          <div class="meta"><span>Colour</span><b>${esc(p.finish)}<i class="dot" style="background:${dotCss(p.finish)}"></i></b></div>
+          <div class="meta"><span>Size</span><b>${esc(sizeTxt(p.size))}</b></div>
         </div>
-        <div class="incart" data-badge="${esc(p.code)}"></div>
+        <div class="price">${money(p.price)}<small>+ GST</small></div>
       </div>
+      <div class="buy">
+        <div class="stepper"><button data-act="minus" aria-label="less">−</button><input type="number" inputmode="numeric" min="1" value="1" aria-label="quantity"><button data-act="plus" aria-label="more">+</button></div>
+        <button class="btn add" data-act="add">Add to order</button>
+      </div>
+      <div class="incart" data-badge="${esc(p.code)}"></div>
     </article>`).join('');
   updateBadges();
 }
@@ -104,7 +128,7 @@ function updateBar() {
 /* ---------- photo viewer ---------- */
 function openLb(code) {
   const p = BY[code]; if (!p) return;
-  lbImgs = (p.images && p.images.length) ? p.images : [PLACEHOLDER]; lbIdx = 0; lbShow();
+  lbImgs = [(p.images && p.images[0]) || PLACEHOLDER]; lbIdx = 0; lbShow();   // only photo 1 is used
   $('#lb').classList.add('open');
   document.querySelectorAll('.lb-n').forEach(b => b.style.display = lbImgs.length > 1 ? 'flex' : 'none');
   $('#lb').dataset.code = code;

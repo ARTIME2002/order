@@ -142,8 +142,16 @@ $('#lb').addEventListener('click', e => {
 });
 
 /* ---------- order sheet ---------- */
-function openSheet() { $('#sheet').classList.add('open'); document.body.classList.add('noscroll'); }
-function closeSheet() { $('#sheet').classList.remove('open'); document.body.classList.remove('noscroll'); }
+let sheetLock = false, downTarget = null;
+// keep the sheet inside the VISIBLE area (above the on-screen keyboard)
+function fitSheet() {
+  const w = $('#sheet'), vv = window.visualViewport;
+  if (!vv || !w.classList.contains('open')) { w.style.top = w.style.height = w.style.bottom = ''; return; }
+  w.style.top = vv.offsetTop + 'px'; w.style.height = vv.height + 'px'; w.style.bottom = 'auto';
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', fitSheet); visualViewport.addEventListener('scroll', fitSheet); }
+function openSheet() { $('#sheet').classList.add('open'); document.body.classList.add('noscroll'); fitSheet(); }
+function closeSheet() { sheetLock = false; $('#sheet').classList.remove('open'); document.body.classList.remove('noscroll'); fitSheet(); }
 function setSheet(html) {
   const old = $('#sheetBox .sheet-body'); const st = old ? old.scrollTop : 0;
   $('#sheetBox').innerHTML = html;
@@ -152,6 +160,7 @@ function setSheet(html) {
 const head = (title, back) => `<div class="sheet-head">${back ? `<button class="x" data-act="${back}">‹</button>` : ''}<h2>${title}</h2><button class="x" data-act="close">&times;</button></div>`;
 
 function stepReview() {
+  sheetLock = false;
   const L = lines(), t = totals();
   if (!L.length) { setSheet(head('Your order') + '<div class="sheet-body"><p class="state">No pieces added yet.</p></div>'); return; }
   setSheet(head('Check your order') + `<div class="sheet-body"><p class="hint">Please check the pieces and quantities.</p>` +
@@ -170,6 +179,7 @@ function stepReview() {
      <button class="btn primary" data-act="to-details">Confirm order →</button></div>`);
 }
 function stepDetails(err) {
+  sheetLock = true;
   const c = JSON.parse(localStorage.getItem(LS_CUST) || '{}'); const e = err || {};
   setSheet(head('Your details', 'to-review') + `<div class="sheet-body">
     <p class="hint">Tell us who is placing this order.</p>
@@ -179,14 +189,16 @@ function stepDetails(err) {
     </div><div class="sheet-foot"><div class="tot"><span>${totals().pcs} pcs</span><b>${money(totals().total)}</b><small>+ GST</small></div>
     <button class="btn primary" data-act="submit">Send order</button></div>`);
 }
-function stepBusy(msg) { setSheet(`<div class="busy"><div class="spin"></div><p>${esc(msg)}</p></div>`); }
+function stepBusy(msg) { sheetLock = true; setSheet(`<div class="busy"><div class="spin"></div><p>${esc(msg)}</p></div>`); }
 function stepDone(o) {
+  sheetLock = false;
   setSheet(`<div class="done"><div class="tick">✓</div><h2>Order sent!</h2>
     <p>Thank you, <b>${esc(o.name)}</b>.<br>Your order <b>${esc(o.no)}</b> has been sent to ARTIME. We will contact you on <b>${esc(o.phone)}</b>.</p>
     <button class="btn" data-act="dl">Download order PDF</button>
     <button class="btn primary" data-act="close">Done</button></div>`);
 }
 function stepFail(msg) {
+  sheetLock = false;
   const canShare = !!(navigator.canShare && LAST && LAST.file && navigator.canShare({ files: [LAST.file] }));
   setSheet(`<div class="done"><div class="tick bad">!</div><h2>Could not send</h2>
     <p>${esc(msg)}<br>Your order is safe. Try again, or send the PDF yourself.</p>
@@ -197,8 +209,9 @@ function stepFail(msg) {
 }
 
 $('#placeBtn').addEventListener('click', () => { openSheet(); stepReview(); });
+$('#sheet').addEventListener('pointerdown', e => { downTarget = e.target; });
 $('#sheet').addEventListener('click', e => {
-  if (e.target.id === 'sheet') { closeSheet(); return; }
+  if (e.target.id === 'sheet') { if (!sheetLock && downTarget && downTarget.id === 'sheet') closeSheet(); return; }
   const b = e.target.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act; const line = b.closest('.line'); const code = line && line.dataset.code;
   const it = code && CART.find(i => i.code === code);
@@ -212,6 +225,16 @@ $('#sheet').addEventListener('click', e => {
   else if (act === 'retry') resend();
   else if (act === 'dl') downloadPdf();
   else if (act === 'wa') shareOrWhatsApp();
+});
+$('#sheet').addEventListener('input', e => {
+  if (e.target.id === 'fName' || e.target.id === 'fPhone') {
+    const c = JSON.parse(localStorage.getItem(LS_CUST) || '{}');
+    if (e.target.id === 'fName') c.name = e.target.value; else c.phone = e.target.value;
+    localStorage.setItem(LS_CUST, JSON.stringify(c));
+  }
+});
+$('#sheet').addEventListener('focusin', e => {
+  if (e.target.matches('input,textarea')) setTimeout(() => { try { e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {} }, 350);
 });
 $('#sheet').addEventListener('change', e => {
   if (e.target.dataset.act !== 'lset') return;
@@ -447,5 +470,5 @@ async function fetchCatalog() {
   renderTabs(); renderGrid(); updateBar();
   if ('requestIdleCallback' in window) requestIdleCallback(() => loadJsPdf().catch(() => {})); else setTimeout(() => loadJsPdf().catch(() => {}), 3000);
 })();
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#lb').classList.remove('open'); closeSheet(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#lb').classList.remove('open'); if (!sheetLock) closeSheet(); } });
 })();

@@ -1,5 +1,5 @@
 /* ARTIME service worker - app shell + catalog + images work offline after first visit */
-const VER = 'artime-v2';
+const VER = 'artime-v4';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'customer.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 const IMG_CACHE = VER + '-img';
 const MAX_IMGS = 300;

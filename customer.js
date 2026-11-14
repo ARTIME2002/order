@@ -322,78 +322,85 @@ const rs = n => 'Rs. ' + Number(n).toLocaleString('en-IN');
 
 async function buildPdf(o) {
   await loadJsPdf();
-  const photos = await Promise.all(o.lines.map(l => imgData(l.p.images && l.p.images[0], 260)));
+  const photos = await Promise.all(o.lines.map(l => imgData(l.p.images && l.p.images[0], 460)));
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const W = 210, M = 12, BOTTOM = 270, RH = 28;
-  const X = { photo: M, item: M + 28, size: M + 84, color: M + 114, qty: M + 146, rate: M + 166, amt: W - M };
+  const W = 210, M = 12, BOTTOM = 272, RH = 38, PH = 32;
+  const X = { photo: M, item: M + 38, qty: 116, rate: 152, amt: W - M };
   const dateStr = o.date.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
+  // value followed by a small "+ GST" tag, right-aligned at x
+  function amount(x, y, val, big) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(120, 108, 94);
+    const gst = '+ GST', gw = doc.getTextWidth(gst);
+    doc.text(gst, x, y, { align: 'right' });
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(big ? 10.5 : 9.5); doc.setTextColor(30, 24, 20);
+    doc.text(val, x - gw - 1.5, y, { align: 'right' });
+  }
   function band() {
-    doc.setFillColor(31, 26, 23); doc.rect(0, 0, W, 24, 'F');
-    doc.setTextColor(214, 170, 90); doc.setFont('times', 'bold'); doc.setFontSize(23); doc.text('ARTIME', M, 15);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(225, 214, 192); doc.text('Handcrafted Clocks', M, 20.5);
-    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.text('ORDER', W - M, 15, { align: 'right' });
+    doc.setFillColor(31, 26, 23); doc.rect(0, 0, W, 13, 'F');
+    doc.setTextColor(214, 170, 90); doc.setFont('times', 'bold'); doc.setFontSize(15); doc.text('ARTIME', M, 9);
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('ORDER', W - M, 8.8, { align: 'right' });
   }
   function tableHead(y) {
     doc.setFillColor(240, 232, 218); doc.rect(M, y, W - 2 * M, 8, 'F');
     doc.setTextColor(60, 50, 40); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-    doc.text('PHOTO', X.photo + 2, y + 5.4); doc.text('CODE', X.item, y + 5.4); doc.text('SIZE', X.size, y + 5.4);
-    doc.text('COLOUR', X.color, y + 5.4); doc.text('QTY', X.qty + 8, y + 5.4, { align: 'right' });
-    doc.text('RATE', X.rate + 9, y + 5.4, { align: 'right' }); doc.text('AMOUNT', X.amt - 1, y + 5.4, { align: 'right' });
+    doc.text('PHOTO', X.photo + 2, y + 5.4); doc.text('DETAILS', X.item, y + 5.4);
+    doc.text('QTY', X.qty, y + 5.4, { align: 'right' }); doc.text('RATE', X.rate, y + 5.4, { align: 'right' });
+    doc.text('AMOUNT', X.amt - 1, y + 5.4, { align: 'right' });
     return y + 8;
   }
 
   band();
-  // order + customer block
-  doc.setTextColor(40, 32, 26); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.text('CUSTOMER', M, 33);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.text(pdfSafe(o.name), M, 39);
-  doc.setFontSize(10); doc.text('Mobile: ' + o.phone, M, 44.5);
-  let y = 50;
+  doc.setTextColor(40, 32, 26); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.text('CUSTOMER', M, 23);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11.5); doc.text(pdfSafe(o.name), M, 29);
+  doc.setFontSize(10); doc.text('Mobile: ' + o.phone, M, 34.5);
+  let y = 39.5;
   if (o.note) {
     doc.setFontSize(8.5); doc.setTextColor(110, 98, 86);
-    const nl = doc.splitTextToSize('Note: ' + pdfSafe(o.note), 100).slice(0, 3); doc.text(nl, M, y); y += nl.length * 4;
+    const nl = doc.splitTextToSize('Note: ' + pdfSafe(o.note), 105).slice(0, 3); doc.text(nl, M, y); y += nl.length * 4;
   }
-  doc.setTextColor(40, 32, 26); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.text('ORDER NO', W - M, 33, { align: 'right' });
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.text(o.no, W - M, 39, { align: 'right' });
-  doc.setFontSize(9); doc.setTextColor(110, 98, 86); doc.text(dateStr, W - M, 44.5, { align: 'right' });
-  y = Math.max(y, 52) + 3;
+  doc.setTextColor(40, 32, 26); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.text('ORDER NO', W - M, 23, { align: 'right' });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11.5); doc.text(o.no, W - M, 29, { align: 'right' });
+  doc.setFontSize(9); doc.setTextColor(110, 98, 86); doc.text(dateStr, W - M, 34.5, { align: 'right' });
+  y = Math.max(y, 40) + 4;
   y = tableHead(y);
 
   o.lines.forEach((l, i) => {
-    if (y + RH > BOTTOM) { doc.addPage(); band(); y = tableHead(30); }
+    if (y + RH > BOTTOM) { doc.addPage(); band(); y = tableHead(19); }
     const p = l.p;
     doc.setDrawColor(226, 216, 198); doc.setLineWidth(0.2); doc.line(M, y + RH, W - M, y + RH);
-    // photo
-    const bx = X.photo + 1, by = y + 2, bs = RH - 4;
-    doc.setFillColor(250, 247, 241); doc.rect(bx, by, bs, bs, 'F');
+    // photo (bigger)
+    const bx = X.photo + 1, by = y + 3;
+    doc.setFillColor(250, 247, 241); doc.rect(bx, by, PH, PH, 'F');
     const ph = photos[i];
     if (ph) {
-      const k = Math.min(bs / ph.w, bs / ph.h), w = ph.w * k, h = ph.h * k;
-      doc.addImage(ph.d, 'JPEG', bx + (bs - w) / 2, by + (bs - h) / 2, w, h);
+      const k = Math.min(PH / ph.w, PH / ph.h), w = ph.w * k, h = ph.h * k;
+      doc.addImage(ph.d, 'JPEG', bx + (PH - w) / 2, by + (PH - h) / 2, w, h);
     }
-    doc.setDrawColor(220, 208, 186); doc.rect(bx, by, bs, bs);
-    doc.setTextColor(30, 24, 20);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text(pdfSafe(p.code), X.item, y + 8);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(110, 98, 86);
-    doc.text(doc.splitTextToSize(pdfSafe(p.title), 52).slice(0, 3), X.item, y + 13);
-    doc.setTextColor(30, 24, 20); doc.setFontSize(9);
-    doc.text(doc.splitTextToSize(pdfSafe(sizeTxt(p.size)), 28).slice(0, 3), X.size, y + 8);
-    doc.text(doc.splitTextToSize(pdfSafe(p.finish), 30).slice(0, 3), X.color, y + 8);
-    doc.setFont('helvetica', 'bold'); doc.text(String(l.qty), X.qty + 8, y + 8, { align: 'right' });
-    doc.setFont('helvetica', 'normal'); doc.text(rs(p.price), X.rate + 9, y + 8, { align: 'right' });
-    doc.setFont('helvetica', 'bold'); doc.text(rs(p.price * l.qty), X.amt - 1, y + 8, { align: 'right' });
+    doc.setDrawColor(220, 208, 186); doc.rect(bx, by, PH, PH);
+    // details: code, size, colour under size
+    doc.setTextColor(30, 24, 20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text(pdfSafe(p.code), X.item, y + 10);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(60, 50, 40);
+    const sz = doc.splitTextToSize('Size: ' + pdfSafe(sizeTxt(p.size)), 58).slice(0, 2);
+    doc.text(sz, X.item, y + 17);
+    doc.text('Colour: ' + pdfSafe(p.finish), X.item, y + 17 + sz.length * 5 + 1);
+    // qty / rate / amount (+ GST after each amount)
+    doc.setTextColor(30, 24, 20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text(String(l.qty), X.qty, y + 10, { align: 'right' });
+    amount(X.rate, y + 10, rs(p.price), false);
+    amount(X.amt - 1, y + 10, rs(p.price * l.qty), true);
     y += RH;
   });
 
-  if (y + 26 > BOTTOM + 6) { doc.addPage(); band(); y = 32; }
+  if (y + 24 > BOTTOM + 8) { doc.addPage(); band(); y = 24; }
   y += 6;
-  doc.setFillColor(31, 26, 23); doc.roundedRect(W - M - 80, y, 80, 17, 1.5, 1.5, 'F');
-  doc.setTextColor(225, 214, 192); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-  doc.text(o.pieces + ' pieces', W - M - 76, y + 6.5);
-  doc.setTextColor(214, 170, 90); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-  doc.text(rs(o.total), W - M - 4, y + 11.5, { align: 'right' });
-  doc.setFontSize(7.5); doc.setTextColor(225, 214, 192); doc.setFont('helvetica', 'normal'); doc.text('Exclusive of GST', W - M - 4, y + 15.3, { align: 'right' });
+  doc.setFillColor(31, 26, 23); doc.roundedRect(W - M - 92, y, 92, 16, 1.5, 1.5, 'F');
+  doc.setTextColor(225, 214, 192); doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+  doc.text(o.pieces + (o.pieces === 1 ? ' piece' : ' pieces'), W - M - 88, y + 9.7);
+  doc.setFontSize(8); doc.setTextColor(200, 188, 166);
+  const g = '+ GST', gw = doc.getTextWidth(g); doc.text(g, W - M - 4, y + 9.7, { align: 'right' });
+  doc.setTextColor(214, 170, 90); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+  doc.text(rs(o.total), W - M - 4 - gw - 2, y + 10.2, { align: 'right' });
 
   const st = DATA.settings || {}; const n = doc.getNumberOfPages();
   for (let pg = 1; pg <= n; pg++) {

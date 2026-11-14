@@ -87,11 +87,11 @@ main{max-width:1200px;margin:0 auto;padding:12px}
 .lb-cap{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));color:#ddd;font-size:14px;left:0;right:0;text-align:center}
 
 /* sheet */
-.sheet-wrap{position:fixed;inset:0;background:#0009;z-index:70;display:none;align-items:flex-end;justify-content:center}
+.sheet-wrap{position:fixed;inset:0;overscroll-behavior:contain;background:#0009;z-index:70;display:none;align-items:flex-end;justify-content:center}
 .sheet-wrap.open{display:flex}
-.sheet{background:var(--cream);width:100%;max-width:560px;max-height:92vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .22s ease-out}
+.sheet{background:var(--cream);width:100%;max-width:560px;max-height:94%;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .22s ease-out}
 @keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
-@media(min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:18px;max-height:88vh}}
+@media(min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:18px;max-height:88%}}
 .sheet-head{display:flex;align-items:center;gap:6px;padding:14px 12px 10px 16px;border-bottom:1px solid var(--line);background:#fff}
 .sheet-head h2{margin:0;font-size:18px;flex:1}
 .x{width:36px;height:36px;border:0;border-radius:50%;background:#f1eadc;font-size:22px;line-height:1;color:var(--ink)}
@@ -109,7 +109,7 @@ main{max-width:1200px;margin:0 auto;padding:12px}
 .line-side b{font-size:14px}
 .rm{border:0;background:none;color:var(--err);font-size:12px;padding:4px 0}
 .f{display:block;margin-bottom:14px;font-weight:600;font-size:14px}
-.f input,.f textarea{display:block;width:100%;margin-top:6px;border:1px solid #d8ccb6;border-radius:10px;padding:12px;background:#fff;font-weight:400;color:var(--ink)}
+.f input,.f textarea{display:block;width:100%;margin-top:6px;border:1px solid #d8ccb6;border-radius:10px;padding:12px;font-size:16px;background:#fff;font-weight:400;color:var(--ink)}
 .f input:focus,.f textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
 .f em{display:block;color:var(--err);font-style:normal;font-size:12.5px;margin-top:4px;font-weight:500}
 .f small{font-weight:400;color:var(--muted)}

@@ -31,27 +31,42 @@ main{max-width:1200px;margin:0 auto;padding:12px}
 @media(min-width:1150px){.grid{grid-template-columns:repeat(5,1fr)}}
 .state{grid-column:1/-1;text-align:center;color:var(--muted);padding:50px 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
-.ph{aspect-ratio:1/1;background:#f1eadc;cursor:zoom-in}
+.ph{aspect-ratio:1/1;background:#f1eadc;cursor:zoom-in;overflow:hidden}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
-.info{padding:10px 10px 12px;display:flex;flex-direction:column;gap:2px;flex:1}
-.code{font-weight:700;font-size:14px;word-break:break-all}
-.meta{font-size:12.5px;color:#4b4137}
-.meta span{color:var(--muted);display:inline-block;min-width:46px}
-.price{font-size:17px;font-weight:700;color:var(--gold-d);margin:4px 0 6px}
-.price small{font-size:11px;color:var(--muted);font-weight:400}
-.buy{display:flex;gap:6px;margin-top:auto}
-.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.stepper button{width:30px;height:36px;border:0;background:#f6f0e4;font-size:18px;color:var(--ink)}
-.stepper input{width:38px;height:36px;border:0;text-align:center;font-size:15px;font-weight:600;-moz-appearance:textfield;background:#fff;color:var(--ink)}
+.info{padding:10px 10px 4px;display:flex;flex-direction:column;gap:3px}
+.code{font-weight:700;font-size:14.5px;word-break:break-all;letter-spacing:.2px}
+.metas{display:flex;flex-direction:column;gap:2px}
+.meta{font-size:13px;color:#4b4137;display:flex;align-items:center;gap:8px}
+.meta span{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;min-width:54px}
+.meta b{font-weight:600;display:flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid #0002;flex:none}
+.price{font-size:19px;font-weight:800;color:var(--gold-d);margin-top:3px;display:flex;align-items:baseline;gap:6px}
+.price small{font-size:10.5px;font-weight:700;color:#fff;background:var(--muted);border-radius:999px;padding:1px 7px;letter-spacing:.3px}
+.buy{display:flex;gap:8px;padding:8px 10px 10px;margin-top:auto}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;flex:none}
+.stepper button{width:34px;height:40px;border:0;background:#f6f0e4;font-size:20px;color:var(--ink)}
+.stepper input{width:40px;height:40px;border:0;text-align:center;font-size:16px;font-weight:700;-moz-appearance:textfield;background:#fff;color:var(--ink)}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
-.stepper.sm button{height:30px;width:28px}.stepper.sm input{height:30px;width:36px}
+.stepper.sm button{height:30px;width:28px;font-size:18px}.stepper.sm input{height:30px;width:36px;font-size:15px}
 .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:600}
 .btn.primary{background:var(--gold);border-color:var(--gold);color:#fff}
 .btn.primary:active{background:var(--gold-d)}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
-.btn.add{flex:1;background:var(--dark);border-color:var(--dark);color:#fff;padding:0}
-.incart{font-size:12px;color:var(--ok);min-height:0;margin-top:2px;font-weight:600}
+.btn.add{flex:1;background:var(--dark);border-color:var(--dark);color:#fff;padding:0;height:40px;font-size:14px}
+.btn.add:active{background:#000}
+.incart{font-size:12.5px;color:var(--ok);font-weight:700;padding:0 10px 9px;margin-top:-3px}
 .incart:empty{display:none}
+.viewbtn{flex:none;width:38px;height:38px;border:0;border-radius:10px;background:#2c2520;color:#e0b868;display:flex;align-items:center;justify-content:center}
+
+/* list view (default on phones) */
+.grid.list{grid-template-columns:1fr;gap:10px}
+.grid.list .card{display:grid;grid-template-columns:108px 1fr;grid-template-areas:"ph info" "buy buy" "badge badge"}
+.grid.list .ph{grid-area:ph;aspect-ratio:1/1;border-radius:0}
+.grid.list .info{grid-area:info;padding:10px 12px 8px 12px;justify-content:center;min-width:0}
+.grid.list .buy{grid-area:buy;border-top:1px solid var(--line);background:#fdfaf4;padding:8px 10px}
+.grid.list .incart{grid-area:badge;background:#fdfaf4;padding:0 12px 8px}
+@media(min-width:700px){.grid.list{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.grid.list{grid-template-columns:repeat(3,1fr)}}
 
 /* order bar */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .25s}
@@ -147,3 +162,12 @@ main{max-width:1200px;margin:0 auto;padding:12px}
 .warn{color:var(--err);font-size:12px}
 .btn.danger{color:var(--err);border-color:#e4b9b3}
 @media(max-width:560px){.arow{flex-direction:column}.athumb{width:100%;height:160px}}
+
+/* grid view (compact two-up cards) */
+.grid:not(.list) .meta{flex-direction:column;align-items:flex-start;gap:0;margin-bottom:2px}
+.grid:not(.list) .meta span{min-width:0;font-size:10.5px}
+.grid:not(.list) .buy{flex-direction:column;gap:6px}
+.grid:not(.list) .stepper{width:100%}
+.grid:not(.list) .stepper input{flex:1;min-width:0;width:auto}
+.grid:not(.list) .stepper button{width:44px}
+.grid:not(.list) .btn.add{flex:none;width:100%}

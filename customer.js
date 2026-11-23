@@ -425,9 +425,9 @@ async function buildPdf(o) {
     y += RH; rowsOnPage++;
   });
 
-  // ---- bottom: ONE small row = logo + ARTIME (left), amount | GST 18% | TOTAL (right) ----
-  let by0 = BOTTOM - TB;
-  if (y > RB + 0.5) { y = newPage(); by0 = y + 3; }
+  // ---- right after last item: ONE small row = logo + ARTIME (left), amount | GST 18% | TOTAL (right) ----
+  let by0 = y + 2;                                     // right below the last item
+  if (by0 + TB > BOTTOM + 1.5) { y = newPage(); by0 = y + 2; }
   const gstAmt = Math.round(o.total * 0.18), grand = o.total + gstAmt;
   doc.setFillColor(31, 26, 23); doc.roundedRect(M, by0, W - 2 * M, TB, 1.2, 1.2, 'F');
   const LS = 8;

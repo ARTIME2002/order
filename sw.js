@@ -1,11 +1,11 @@
 /* ARTIME service worker - app shell + catalog + images work offline after first visit */
-const VER = 'artime-v5';
+const VER = 'artime-v6';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'customer.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 const IMG_CACHE = VER + '-img';
 const MAX_IMGS = 300;
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VER).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VER).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys =>
@@ -44,12 +44,16 @@ self.addEventListener('fetch', e => {
     }));
     return;
   }
-  // App files: show cached instantly, refresh in background
+  // App files: network first (always latest), cached copy only when offline
   if (url.origin === location.origin) {
     e.respondWith(caches.open(VER).then(async c => {
-      const hit = await c.match(req, { ignoreSearch: true });
-      const net = fetch(req).then(r => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => hit);
-      return hit || net;
+      try {
+        const r = await fetch(req.url, { cache: 'no-cache' });
+        if (r && r.ok) c.put(req, r.clone());
+        return r;
+      } catch (err) {
+        return (await c.match(req, { ignoreSearch: true })) || Response.error();
+      }
     }));
   }
 });
